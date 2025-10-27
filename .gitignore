@@ -1,0 +1,53 @@
+# Maven/Gradle build output
+**/target/
+**/build/
+*.log
+
+# Eclipse/IntelliJ IDEA
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# Node.js dependencies / compiled assets
+**/node_modules/
+**/.parcel-cache/
+**/.next/
+**/dist/
+**/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive configs
+.env
+*.local.yml
+
+# Generated docs
+**/docs/
+
+# Local DB
+*.h2.db
+*.mv.db
+
+# Others
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Out/coverage
+coverage/
+output/
+
+# Ignore logs
+logs/
+*.log
+
+# Docker
+*.pid

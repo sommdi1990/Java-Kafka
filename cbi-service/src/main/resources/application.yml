@@ -1,0 +1,46 @@
+# CBI Service Configuration
+spring.application.name=cbi-service
+server.port=8081
+  
+  # Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/cbi_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.username=cbi_user
+spring.datasource.password=cbi_password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+  
+  # JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.format_sql=true
+  
+  # Web Services Configuration
+spring.webservices.wsdl-locations=classpath:wsdl/
+spring.webservices.path=/ws
+  
+  # Kafka Configuration
+spring.kafka.bootstrap-servers=localhost:9092
+spring.kafka.consumer.group-id=cbi-service-group
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+  
+  # WebClient Configuration
+spring.webflux.timeout=30s
+  
+  # Logging Configuration
+logging.level.com.kafka.cbi=INFO
+logging.level.org.springframework.ws=DEBUG
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+  
+  # Management Endpoints
+management.endpoints.web.exposure.include=*
+management.endpoint.health.show-details=always
+management.endpoint.info.enabled=true
+  
+  # Native Image Configuration
+spring.aot.enabled=true
+spring.native.build-args=--initialize-at-build-time=org.springframework.ws
