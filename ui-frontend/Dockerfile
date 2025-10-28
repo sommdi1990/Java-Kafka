@@ -4,13 +4,13 @@ FROM node:18-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy only package files first
 COPY package*.json ./
 
-# Install dependencies (no lockfile available)
-RUN npm install --omit=dev
+# Install dependencies (include devDependencies for build)
+RUN npm install
 
-# Copy source code
+# Copy the rest of the app, but exclude node_modules
 COPY . .
 
 # Build the application

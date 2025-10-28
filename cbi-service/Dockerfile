@@ -1,44 +1,27 @@
-# Multi-stage build for GraalVM Native Image
-FROM ghcr.io/graalvm/graalvm-community:21 AS graalvm
+## Build stage: Maven
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
 
-# Install native-image
-RUN gu install native-image
+# Copy Maven project files (multi-module)
+COPY pom.xml ./
+COPY shared-lib/pom.xml shared-lib/pom.xml
+COPY cbi-service/pom.xml cbi-service/pom.xml
 
-# Set working directory
-WORKDIR /app
-
-# Copy Maven files
-COPY pom.xml .
-COPY shared-lib/pom.xml shared-lib/
-COPY */pom.xml ./*/
-
-# Copy source code
+# Copy sources
 COPY shared-lib/src shared-lib/src
-COPY */src ./*/src
+COPY cbi-service/src cbi-service/src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build: install parent POM, then shared-lib, then this module
+RUN mvn -q -N -f pom.xml -Dexec.skip=true -DskipTests install \
+    && mvn -q -DskipTests -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.connectionTimeout=60000 -Dmaven.wagon.http.readTimeout=600000 -f shared-lib/pom.xml install \
+    && mvn -q -DskipTests -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.connectionTimeout=60000 -Dmaven.wagon.http.readTimeout=600000 -f cbi-service/pom.xml -am package
 
-# Create native image
-RUN native-image -jar target/*.jar -H:+StaticExecutableWithDynamicLibC --no-fallback
-
-# Final stage
-FROM ubuntu:22.04
-
-# Install required libraries
-RUN apt-get update && apt-get install -y \
-    libc6 \
-    libstdc++6 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy the native executable
-COPY --from=graalvm /app/target/* /app/
-
-# Set working directory
+## Runtime stage: JRE
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Expose port
-EXPOSE 8081
+# Copy the built jar
+COPY --from=build /workspace/cbi-service/target/cbi-service-*.jar app.jar
 
-# Run the application
-CMD ["./cbi-service"]
+EXPOSE 8081
+ENTRYPOINT ["java","-jar","/app/app.jar"]
