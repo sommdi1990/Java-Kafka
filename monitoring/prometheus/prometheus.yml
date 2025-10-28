@@ -68,12 +68,8 @@ scrape_configs:
         labels:
           service: 'kafka-manager'
 
-  # Kafka JMX (if configured)
-  - job_name: 'kafka'
-    static_configs:
-      - targets: [ 'kafka:9092' ]
-        labels:
-          service: 'kafka'
+  # Kafka metrics should be scraped via JMX exporter, not the broker TCP port.
+  # Add a jmx_exporter sidecar (e.g., on 7071) and point Prometheus to that instead.
 
   # MySQL (if configured with mysqld_exporter)
   - job_name: 'mysql'
