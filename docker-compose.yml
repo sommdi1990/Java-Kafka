@@ -68,8 +68,8 @@ services:
   # Spring Boot Admin
   spring-boot-admin:
     build:
-      context: ./spring-boot-admin
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: spring-boot-admin/Dockerfile
     container_name: spring-boot-admin
     depends_on:
       - mysql
@@ -85,8 +85,8 @@ services:
   # CBI Service
   cbi-service:
     build:
-      context: ./cbi-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: cbi-service/Dockerfile
     container_name: cbi-service
     depends_on:
       - mysql
@@ -104,8 +104,8 @@ services:
   # Schedule Service
   schedule-service:
     build:
-      context: ./schedule-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: schedule-service/Dockerfile
     container_name: schedule-service
     depends_on:
       - mysql
@@ -123,8 +123,8 @@ services:
   # Workflow Service
   workflow-service:
     build:
-      context: ./workflow-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: workflow-service/Dockerfile
     container_name: workflow-service
     depends_on:
       - mysql
@@ -142,8 +142,8 @@ services:
   # Gateway Service
   gateway-service:
     build:
-      context: ./gateway-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: gateway-service/Dockerfile
     container_name: gateway-service
     depends_on:
       - mysql
@@ -161,8 +161,8 @@ services:
   # Kafka Manager
   kafka-manager:
     build:
-      context: ./kafka-manager
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: kafka-manager/Dockerfile
     container_name: kafka-manager
     depends_on:
       - mysql

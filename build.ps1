@@ -17,6 +17,35 @@ if (Test-Path $preferredMaven) {
     Write-Host "[INFO] Using preferred Maven: $preferredMaven" -ForegroundColor Cyan
 }
 
+# Ensure Node.js/npm available on PATH
+$npmCmd = "npm"
+try {
+    $null = & $npmCmd -v 2>$null
+} catch {
+    # Try Windows default install paths
+    $possibleNodeHomes = @(
+        "C:\Program Files\nodejs",
+        "C:\Program Files (x86)\nodejs",
+        "$env:LOCALAPPDATA\Programs\nodejs"
+    )
+    foreach ($dir in $possibleNodeHomes) {
+        if (Test-Path "$dir\npm.cmd") {
+            $env:Path = "$dir;$env:Path"
+            Write-Host "[INFO] Using Node.js from: $dir" -ForegroundColor Cyan
+            break
+        }
+    }
+}
+
+# Verify npm now exists
+try {
+    $npmVersion = npm -v 2>&1
+    Write-Host "[INFO] npm detected: $npmVersion" -ForegroundColor Cyan
+} catch {
+    Write-Host "[ERROR] npm is not installed or not in PATH. Please install Node.js from https://nodejs.org/ and try again." -ForegroundColor Red
+    exit 1
+}
+
 # Check if Java is installed
 Write-Host "[INFO] Checking Java installation..." -ForegroundColor Cyan
 

@@ -2,6 +2,7 @@ import React, {useCallback} from 'react'
 import ReactFlow, {
     addEdge,
     Background,
+    BackgroundVariant,
     Connection,
     Controls,
     MiniMap,
@@ -116,7 +117,7 @@ const WorkflowDesigner: React.FC = () => {
                         >
                             <Controls/>
                             <MiniMap/>
-                            <Background variant="dots" gap={12} size={1}/>
+                            <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
                         </ReactFlow>
                     </div>
                 </div>
