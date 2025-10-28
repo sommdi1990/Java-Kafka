@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/logs")
@@ -37,9 +39,19 @@ public class LogController {
         Page<SystemLog> logs;
 
         if (serviceName != null && startDate != null && endDate != null) {
-            logs = systemLogRepository.findByServiceNameAndCreatedAtBetween(serviceName, startDate, endDate, pageable);
+            List<SystemLog> allLogs = systemLogRepository.findByServiceNameAndCreatedAtBetween(serviceName, startDate, endDate);
+            // Manually paginate the results
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), allLogs.size());
+            List<SystemLog> pageContent = allLogs.subList(start, end);
+            logs = new org.springframework.data.domain.PageImpl<>(pageContent, pageable, allLogs.size());
         } else if (logLevel != null && startDate != null && endDate != null) {
-            logs = systemLogRepository.findByLogLevelAndCreatedAtBetween(logLevel, startDate, endDate, pageable);
+            List<SystemLog> allLogs = systemLogRepository.findByLogLevelAndCreatedAtBetween(logLevel, startDate, endDate);
+            // Manually paginate the results
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), allLogs.size());
+            List<SystemLog> pageContent = allLogs.subList(start, end);
+            logs = new org.springframework.data.domain.PageImpl<>(pageContent, pageable, allLogs.size());
         } else {
             logs = systemLogRepository.findAll(pageable);
         }
@@ -65,14 +77,14 @@ public class LogController {
 
         Long totalLogs = serviceName != null ?
                 systemLogRepository.countByServiceNameAndDateRange(serviceName, startDate, endDate) :
-                systemLogRepository.countByCreatedAtBetween(startDate, endDate);
+                systemLogRepository.count();
 
-        return ApiResponse.success("Statistics retrieved successfully",
-                new Object() {
-                    public final Long totalLogs = totalLogs;
-                    public final String serviceName = serviceName;
-                    public final LocalDateTime startDate = startDate;
-                    public final LocalDateTime endDate = endDate;
-                });
+        Map<String, Object> statistics = new HashMap<>();
+        statistics.put("totalLogs", totalLogs);
+        statistics.put("serviceName", serviceName);
+        statistics.put("startDate", startDate);
+        statistics.put("endDate", endDate);
+
+        return ApiResponse.success("Statistics retrieved successfully", statistics);
     }
 }

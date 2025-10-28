@@ -19,11 +19,10 @@
 **/.next/
 **/dist/
 **/build/
-workflow-service/node/
-schedule-service/node/
-kafka-manager/node/
-gateway-service/node/
-cbi-service/node/
+
+# Node.js executable directories (installed by frontend-maven-plugin)
+**/node/
+node/
 
 # OS files
 .DS_Store

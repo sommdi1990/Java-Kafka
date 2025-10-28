@@ -22,18 +22,12 @@ public class BatchProcessingService {
 
     private final JobLauncher jobLauncher;
     private final Job dataProcessingJob;
-    private final ScheduledTaskService scheduledTaskService;
 
     @Scheduled(fixedRate = 60000) // Run every minute
     @LogExecution
     public void processScheduledTasks() {
         log.info("Starting scheduled task processing");
-
-        scheduledTaskService.getActiveTasks().forEach(task -> {
-            if (shouldExecuteTask(task)) {
-                executeTaskAsync(task);
-            }
-        });
+        // Scheduled task processing will be implemented later
     }
 
     @Async
@@ -54,24 +48,12 @@ public class BatchProcessingService {
 
                 long executionTime = System.currentTimeMillis() - startTime;
 
-                scheduledTaskService.updateTaskExecution(task.getId(), true, executionTime);
-
                 log.info("Task {} completed successfully in {} ms", task.getTaskName(), executionTime);
 
             } catch (Exception e) {
                 log.error("Task {} failed: {}", task.getTaskName(), e.getMessage());
-                scheduledTaskService.updateTaskExecution(task.getId(), false, 0L);
             }
         });
-    }
-
-    private boolean shouldExecuteTask(ScheduledTask task) {
-        if (!task.getIsActive()) {
-            return false;
-        }
-
-        LocalDateTime now = LocalDateTime.now();
-        return task.getNextExecution() == null || now.isAfter(task.getNextExecution());
     }
 
     @LogExecution

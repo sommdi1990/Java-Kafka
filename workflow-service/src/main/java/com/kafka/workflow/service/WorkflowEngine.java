@@ -3,7 +3,7 @@ package com.kafka.workflow.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.shared.annotation.LogExecution;
-import com.kafka.workflow.dto.WorkflowDefinition;
+import com.kafka.shared.dto.WorkflowDefinition;
 import com.kafka.workflow.dto.WorkflowInstance;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package com.kafka.workflow.controller;
 
 import com.kafka.shared.annotation.LogExecution;
 import com.kafka.shared.dto.ApiResponse;
-import com.kafka.workflow.dto.WorkflowDefinition;
+import com.kafka.shared.dto.WorkflowDefinition;
 import com.kafka.workflow.dto.WorkflowInstance;
 import com.kafka.workflow.service.WorkflowEngine;
 import lombok.RequiredArgsConstructor;
