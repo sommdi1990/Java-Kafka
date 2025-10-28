@@ -64,10 +64,11 @@ management:
       enabled: true
     prometheus:
       enabled: true
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
-    tags:
+  observations:
+    key-values:
       service: workflow-service
       application: ${spring.application.name}
