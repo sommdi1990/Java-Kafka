@@ -75,10 +75,12 @@ services:
       - mysql
     ports:
       - "8080:8080"
+      - "5000:5000"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/admin_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: admin_password
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5000
     networks:
       - kafka-network
 
@@ -93,11 +95,13 @@ services:
       - kafka
     ports:
       - "8081:8081"
+      - "5001:5001"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cbi_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: cbi_user
       SPRING_DATASOURCE_PASSWORD: cbi_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5001
     networks:
       - kafka-network
 
@@ -112,11 +116,13 @@ services:
       - kafka
     ports:
       - "8082:8082"
+      - "5002:5002"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/schedule_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: schedule_user
       SPRING_DATASOURCE_PASSWORD: schedule_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5002
     networks:
       - kafka-network
 
@@ -131,11 +137,13 @@ services:
       - kafka
     ports:
       - "8083:8083"
+      - "5003:5003"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/workflow_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: workflow_user
       SPRING_DATASOURCE_PASSWORD: workflow_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5003
     networks:
       - kafka-network
 
@@ -150,11 +158,13 @@ services:
       - kafka
     ports:
       - "8084:8084"
+      - "5004:5004"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gateway_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: gateway_user
       SPRING_DATASOURCE_PASSWORD: gateway_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5004
     networks:
       - kafka-network
 
@@ -169,11 +179,13 @@ services:
       - kafka
     ports:
       - "8085:8085"
+      - "5005:5005"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/kafka_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: kafka_user
       SPRING_DATASOURCE_PASSWORD: kafka_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     networks:
       - kafka-network
 

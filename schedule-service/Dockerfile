@@ -6,6 +6,7 @@ WORKDIR /workspace
 COPY pom.xml ./
 COPY shared-lib/pom.xml shared-lib/pom.xml
 COPY schedule-service/pom.xml schedule-service/pom.xml
+COPY settings-docker.xml /root/.m2/settings.xml
 
 # Copy sources
 COPY shared-lib/src shared-lib/src

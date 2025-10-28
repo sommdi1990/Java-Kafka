@@ -16,6 +16,9 @@ RUN mvn -q -N -f pom.xml -Dexec.skip=true -DskipTests install \
     && mvn -q -DskipTests -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.connectionTimeout=60000 -Dmaven.wagon.http.readTimeout=600000 -f shared-lib/pom.xml install \
     && mvn -q -DskipTests -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.connectionTimeout=60000 -Dmaven.wagon.http.readTimeout=600000 -f kafka-manager/pom.xml -am package
 
+# Copy Maven settings to use public Aliyun mirror for better access from restricted networks
+COPY kafka-manager/settings-docker.xml /root/.m2/settings.xml
+
 ## Runtime stage: JRE
 FROM eclipse-temurin:21-jre
 WORKDIR /app
