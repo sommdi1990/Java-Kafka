@@ -1,47 +1,85 @@
 # Kafka Manager Configuration
-spring.application.name=kafka-manager
-server.port=8085
+spring:
+  application:
+    name: kafka-manager
   
   # Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/kafka_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-spring.datasource.username=kafka_user
-spring.datasource.password=kafka_password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql://localhost:3306/kafka_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: kafka_user
+    password: kafka_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
   
   # JPA Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-spring.jpa.properties.hibernate.format_sql=true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
   
   # Kafka Configuration
-spring.kafka.bootstrap-servers=localhost:9092
-spring.kafka.consumer.group-id=kafka-manager-group
-spring.kafka.consumer.auto-offset-reset=earliest
-spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
-spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
-spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
-spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
-  
-  # Kafka Admin Configuration
-kafka.admin.bootstrap-servers=localhost:9092
-kafka.admin.client-id=kafka-manager-admin
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: kafka-manager-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   
   # WebSocket Configuration
-spring.websocket.path=/ws
-spring.websocket.allowed-origins=*
-  
-  # Logging Configuration
-logging.level.com.kafka.kafka=INFO
-logging.level.org.apache.kafka=INFO
-logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-  
-  # Management Endpoints
-management.endpoints.web.exposure.include=*
-management.endpoint.health.show-details=always
-management.endpoint.info.enabled=true
+  websocket:
+    path: /ws
+    allowed-origins: "*"
   
   # Native Image Configuration
-spring.aot.enabled=true
-spring.native.build-args=--initialize-at-build-time=org.apache.kafka
+  aot:
+    enabled: true
+  native:
+    build-args: "--initialize-at-build-time=org.apache.kafka"
+
+server:
+  port: 8085
+
+# Kafka Admin Configuration
+kafka:
+  admin:
+    bootstrap-servers: localhost:9092
+    client-id: kafka-manager-admin
+
+# Logging Configuration
+logging:
+  level:
+    com.kafka.kafka: INFO
+    org.apache.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    metrics:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      service: kafka-manager
+      application: ${spring.application.name}

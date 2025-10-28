@@ -1,38 +1,73 @@
 # WorkFlow Service Configuration
-spring.application.name=workflow-service
-server.port=8083
+spring:
+  application:
+    name: workflow-service
   
   # Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/workflow_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-spring.datasource.username=workflow_user
-spring.datasource.password=workflow_password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql://localhost:3306/workflow_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: workflow_user
+    password: workflow_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
   
   # JPA Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-spring.jpa.properties.hibernate.format_sql=true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
   
   # Kafka Configuration
-spring.kafka.bootstrap-servers=localhost:9092
-spring.kafka.consumer.group-id=workflow-service-group
-spring.kafka.consumer.auto-offset-reset=earliest
-spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
-spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
-spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
-spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
-  
-  # Logging Configuration
-logging.level.com.kafka.workflow=INFO
-logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-  
-  # Management Endpoints
-management.endpoints.web.exposure.include=*
-management.endpoint.health.show-details=always
-management.endpoint.info.enabled=true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: workflow-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   
   # Native Image Configuration
-spring.aot.enabled=true
-spring.native.build-args=--initialize-at-build-time=com.kafka.workflow
+  aot:
+    enabled: true
+  native:
+    build-args: "--initialize-at-build-time=com.kafka.workflow"
+
+server:
+  port: 8083
+
+# Logging Configuration
+logging:
+  level:
+    com.kafka.workflow: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    metrics:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      service: workflow-service
+      application: ${spring.application.name}

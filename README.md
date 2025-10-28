@@ -21,6 +21,16 @@
 | gateway-service      | gateway_db  | gateway_user    | gateway_password|
 | kafka-manager        | kafka_db    | kafka_user      | kafka_password  |
 
+### 📊 مانیتورینگ و مشاهده (Monitoring)**
+
+- **Grafana**
+    - **Username:** `admin`
+    - **Password:** `admin123`
+    - **URL:** http://localhost:9091
+- **Prometheus**
+    - **URL:** http://localhost:9090
+    - **دسترسی:** بدون نیاز به ورود
+
 ### ⚠️ نکات امنیتی:
 - رمز عبورها بعد از راه‌اندازی حتما تغییر داده شود.
 - برای محیط واقعی از رمزهای قوی و یکتا استفاده کنید!
@@ -54,6 +64,8 @@ open http://localhost:3000
 - **TypeScript UI** with drag-and-drop workflow designer
 - **AOP Logging** across all services
 - **Multi-database** MySQL setup with Flyway migrations
+- **Prometheus** for metrics collection
+- **Grafana** for monitoring dashboards
 
 ## 🏗️ Architecture
 
@@ -99,19 +111,22 @@ open http://localhost:3000
 - [Architecture Overview](Java-Kafka.wiki/Architecture.md)
 - [Installation Guide](Java-Kafka.wiki/Installation.md)
 - [API Documentation](Java-Kafka.wiki/API-Documentation.md)
+- [Monitoring Guide](monitoring/MONITORING.md)
 
 ## 🔧 Services
 
-| Service | Port | Description |
-|---------|------|-------------|
-| UI Frontend | 3000 | React TypeScript UI with workflow designer |
-| Spring Boot Admin | 8080 | Centralized monitoring and log management |
-| CBI Service | 8081 | Central Business Integration with WSDL support |
-| Schedule Service | 8082 | Scheduled data processing with Spring Batch |
-| Workflow Service | 8083 | Workflow management and orchestration |
-| Gateway Service | 8084 | API Gateway with Spring Security |
-| Kafka Manager | 8085 | Kafka cluster management and monitoring |
-| Kafka UI | 8086 | Web-based Kafka management interface |
+| Service           | Port | Description                                    |
+|-------------------|------|------------------------------------------------|
+| UI Frontend       | 3000 | React TypeScript UI with workflow designer     |
+| Spring Boot Admin | 8080 | Centralized monitoring and log management      |
+| CBI Service       | 8081 | Central Business Integration with WSDL support |
+| Schedule Service  | 8082 | Scheduled data processing with Spring Batch    |
+| Workflow Service  | 8083 | Workflow management and orchestration          |
+| Gateway Service   | 8084 | API Gateway with Spring Security               |
+| Kafka Manager     | 8085 | Kafka cluster management and monitoring        |
+| Kafka UI          | 8086 | Web-based Kafka management interface           |
+| Prometheus        | 9090 | Metrics collection and storage                 |
+| Grafana           | 9091 | Monitoring dashboards and visualization        |
 
 ## 🚀 Getting Started
 
@@ -144,6 +159,8 @@ open http://localhost:3000
    - Spring Boot Admin: http://localhost:8080
    - Gateway Service: http://localhost:8084
    - Kafka UI: http://localhost:8086
+   - Prometheus: http://localhost:9090
+   - Grafana: http://localhost:9091 (admin / admin123)
 
 ### Default Credentials
 - **Username**: `admin`
@@ -166,6 +183,22 @@ curl -H "Authorization: Bearer <token>" \
 
 ## 📊 Monitoring
 
+### Grafana
+
+- Real-time metrics visualization
+- Custom dashboards for microservices
+- Alert management
+- Performance analysis
+- **Access:** http://localhost:9091 (admin / admin123)
+
+### Prometheus
+
+- Metrics collection and storage
+- Query language (PromQL)
+- Service discovery
+- Long-term data storage
+- **Access:** http://localhost:9090
+
 ### Spring Boot Admin
 - Real-time service monitoring
 - Health check dashboard
@@ -183,6 +216,15 @@ curl -H "Authorization: Bearer <token>" \
 - Performance monitoring
 - Error tracking
 - Database persistence
+
+### Monitoring Metrics
+
+Each service exposes metrics at `/actuator/prometheus`:
+
+- **JVM Metrics:** Memory, CPU, Threads, GC
+- **HTTP Metrics:** Request count, response time, error rate
+- **Kafka Metrics:** Consumer lag, message rate
+- **Database Metrics:** Connection pool, query performance
 
 ## 🏗️ Development
 

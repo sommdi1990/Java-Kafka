@@ -19,17 +19,15 @@
 **/.next/
 **/dist/
 **/build/
+workflow-service/node/
+schedule-service/node/
+kafka-manager/node/
+gateway-service/node/
+cbi-service/node/
 
 # OS files
 .DS_Store
 Thumbs.db
-
-# Sensitive configs
-.env
-*.local.yml
-
-# Generated docs
-**/docs/
 
 # Local DB
 *.h2.db
