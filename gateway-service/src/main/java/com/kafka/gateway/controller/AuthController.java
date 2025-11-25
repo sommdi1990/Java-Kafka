@@ -48,6 +48,42 @@ public class AuthController {
         }
     }
 
+    /**
+     * Client Credentials-like flow for backend/service integrations.
+     * Accepts a clientId/clientSecret pair and returns a JWT with SERVICE role.
+     */
+    @PostMapping("/service-token")
+    @LogExecution
+    public ApiResponse<Map<String, Object>> createServiceToken(@RequestBody Map<String, String> request) {
+        String clientId = request.get("clientId");
+        String clientSecret = request.get("clientSecret");
+
+        if (!isValidServiceClient(clientId, clientSecret)) {
+            return ApiResponse.error("Invalid service credentials");
+        }
+
+        User user = User.builder()
+                .id(0L)
+                .username(clientId)
+                .email(clientId + "@services.local")
+                .roles(Set.of(User.Role.ADMIN))
+                .isActive(true)
+                .isLocked(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        String token = jwtService.generateToken(user);
+
+        Map<String, Object> response = Map.of(
+                "token", token,
+                "clientId", clientId,
+                "roles", user.getRoles(),
+                "expiresAt", LocalDateTime.now().plusHours(24)
+        );
+
+        return ApiResponse.success("Service token issued", response);
+    }
+
     @PostMapping("/register")
     @LogExecution
     public ApiResponse<Map<String, Object>> register(@RequestBody Map<String, String> registerRequest) {
@@ -111,6 +147,11 @@ public class AuthController {
         // Simple validation - in real implementation, check against database
         return "admin".equals(username) && "admin123".equals(password) ||
                 "user".equals(username) && "user123".equals(password);
+    }
+
+    private boolean isValidServiceClient(String clientId, String clientSecret) {
+        // Simple fixed credentials for demo purposes; replace with DB/secret-store lookup.
+        return "service-client".equals(clientId) && "service-secret".equals(clientSecret);
     }
 
     private User createSampleUser(String username) {

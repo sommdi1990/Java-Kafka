@@ -85,7 +85,7 @@ const WorkflowDesigner: React.FC = () => {
 
             <Card style={{flex: 1}}>
                 <div style={{height: '100%', display: 'flex'}}>
-                    <div style={{width: '200px', padding: '16px', borderRight: '1px solid #f0f0f0'}}>
+                    <div style={{width: '220px', padding: '16px', borderRight: '1px solid #f0f0f0'}}>
                         <Title level={5}>Node Types</Title>
                         <Space direction="vertical" style={{width: '100%'}}>
                             <Button block onClick={() => addNode('Service Call')}>
@@ -102,6 +102,15 @@ const WorkflowDesigner: React.FC = () => {
                             </Button>
                             <Button block onClick={() => addNode('Condition')}>
                                 Condition
+                            </Button>
+                            <Button block onClick={() => addNode('GraphQL Call')}>
+                                GraphQL Call
+                            </Button>
+                            <Button block onClick={() => addNode('Delay')}>
+                                Delay
+                            </Button>
+                            <Button block onClick={() => addNode('External Event')}>
+                                External Event
                             </Button>
                         </Space>
                     </div>

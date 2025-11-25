@@ -67,23 +67,15 @@ public class WorkflowEngine {
                 instance.setCurrentStep(stepName);
 
                 switch (stepType) {
-                    case "service_call":
-                        executeServiceCall(step, contextData);
-                        break;
-                    case "schedule_task":
-                        executeScheduleTask(step, contextData);
-                        break;
-                    case "data_processing":
-                        executeDataProcessing(step, contextData);
-                        break;
-                    case "notification":
-                        executeNotification(step, contextData);
-                        break;
-                    case "condition":
-                        executeCondition(step, contextData);
-                        break;
-                    default:
-                        log.warn("Unknown step type: {}", stepType);
+                    case "service_call" -> executeServiceCall(step, contextData);
+                    case "graphql_call" -> executeGraphQLCall(step, contextData);
+                    case "schedule_task" -> executeScheduleTask(step, contextData);
+                    case "data_processing" -> executeDataProcessing(step, contextData);
+                    case "notification" -> executeNotification(step, contextData);
+                    case "condition" -> executeCondition(step, contextData);
+                    case "delay" -> executeDelay(step);
+                    case "external_event" -> executeExternalEvent(step, contextData);
+                    default -> log.warn("Unknown step type: {}", stepType);
                 }
             }
         }
@@ -105,6 +97,23 @@ public class WorkflowEngine {
         );
 
         kafkaTemplate.send("service-calls", serviceCallMessage);
+    }
+
+    @LogExecution
+    private void executeGraphQLCall(JsonNode step, Map<String, Object> contextData) {
+        String serviceName = step.path("service").asText();
+        String graphQlQuery = step.path("query").asText();
+
+        log.info("Executing GraphQL call for service: {}", serviceName);
+
+        Map<String, Object> graphQlMessage = Map.of(
+                "service", serviceName,
+                "query", graphQlQuery,
+                "context", contextData,
+                "timestamp", LocalDateTime.now().toString()
+        );
+
+        kafkaTemplate.send("graphql-calls", graphQlMessage);
     }
 
     @LogExecution
@@ -159,6 +168,37 @@ public class WorkflowEngine {
         );
 
         kafkaTemplate.send("notifications", notificationMessage);
+    }
+
+    @LogExecution
+    private void executeDelay(JsonNode step) {
+        long delayMs = step.path("delayMs").asLong(0);
+        if (delayMs <= 0) {
+            return;
+        }
+
+        log.info("Delaying workflow for {} ms", delayMs);
+        try {
+            Thread.sleep(delayMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Delay step interrupted", e);
+        }
+    }
+
+    @LogExecution
+    private void executeExternalEvent(JsonNode step, Map<String, Object> contextData) {
+        String eventType = step.path("eventType").asText("generic");
+
+        log.info("Publishing external event of type: {}", eventType);
+
+        Map<String, Object> eventMessage = Map.of(
+                "type", eventType,
+                "payload", contextData,
+                "timestamp", LocalDateTime.now().toString()
+        );
+
+        kafkaTemplate.send("workflow-external-events", eventMessage);
     }
 
     @LogExecution

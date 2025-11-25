@@ -431,11 +431,12 @@ For support and questions:
 - Implemented Spring Batch for data processing
 
 ### Roadmap
-- [ ] Add more external service integrations
-- [ ] Implement advanced workflow features
-- [ ] Add more monitoring dashboards
-- [ ] Implement distributed tracing
-- [ ] Add more authentication providers
+
+- [x] Add more external service integrations (REST / SOAP / GraphQL with multiple auth strategies)
+- [x] Implement advanced workflow features (GraphQL steps, external events, delays, richer node types in UI)
+- [x] Add more monitoring dashboards (Kafka & DB overview in Grafana)
+- [x] Implement distributed tracing (Micrometer Tracing + OpenTelemetry OTLP → Grafana Tempo)
+- [x] Add more authentication providers (service-to-service client credentials flow)
 
 ---
 

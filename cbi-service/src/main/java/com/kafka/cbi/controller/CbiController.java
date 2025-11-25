@@ -72,12 +72,50 @@ public class CbiController {
         return ApiResponse.success("WSDL service call completed", result);
     }
 
+    /**
+     * Sample external integrations to demonstrate multiple provider types:
+     * 1 -> Public JSON REST API
+     * 2 -> GraphQL demo API
+     * 3 -> SOAP/WSDL banking-like service (stub)
+     */
     private ExternalService createSampleService(Long serviceId) {
+        if (serviceId == 2L) {
+            return ExternalService.builder()
+                    .id(serviceId)
+                    .name("Countries GraphQL API")
+                    .description("Public GraphQL API for country data")
+                    .serviceType(ExternalService.ServiceType.GRAPHQL)
+                    .endpointUrl("https://countries.trevorblades.com")
+                    .authenticationType(ExternalService.AuthenticationType.NONE)
+                    .isActive(true)
+                    .timeoutMs(30000)
+                    .retryCount(3)
+                    .build();
+        } else if (serviceId == 3L) {
+            return ExternalService.builder()
+                    .id(serviceId)
+                    .name("Sample SOAP Bank Service")
+                    .description("Demo SOAP/WSDL service for financial operations")
+                    .serviceType(ExternalService.ServiceType.SOAP_WEB_SERVICE)
+                    .endpointUrl("https://example.com/soap/bank")
+                    .wsdlUrl("https://example.com/soap/bank?wsdl")
+                    .authenticationType(ExternalService.AuthenticationType.BASIC_AUTH)
+                    .username("demo-user")
+                    .password("demo-password")
+                    .isActive(true)
+                    .timeoutMs(30000)
+                    .retryCount(3)
+                    .build();
+        }
+
+        // Default REST API example
         return ExternalService.builder()
                 .id(serviceId)
-                .name("Sample Service " + serviceId)
+                .name("JSONPlaceholder REST API")
+                .description("Public JSONPlaceholder test REST API")
                 .serviceType(ExternalService.ServiceType.REST_API)
                 .endpointUrl("https://jsonplaceholder.typicode.com")
+                .authenticationType(ExternalService.AuthenticationType.NONE)
                 .isActive(true)
                 .timeoutMs(30000)
                 .retryCount(3)

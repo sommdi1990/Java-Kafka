@@ -81,6 +81,8 @@ services:
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: admin_password
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5000
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     networks:
       - kafka-network
 
@@ -102,6 +104,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: cbi_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5001
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     networks:
       - kafka-network
 
@@ -123,6 +127,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: schedule_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5002
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     networks:
       - kafka-network
 
@@ -144,6 +150,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: workflow_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5003
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     networks:
       - kafka-network
 
@@ -165,6 +173,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: gateway_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5004
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     networks:
       - kafka-network
 
@@ -186,6 +196,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: kafka_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     networks:
       - kafka-network
 
@@ -241,6 +253,19 @@ services:
       - kafka-network
     restart: unless-stopped
 
+  # Grafana Tempo (distributed tracing backend)
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    ports:
+      - "4318:4318" # OTLP HTTP
+    command: [ "-config.file=/etc/tempo/tempo.yml" ]
+    volumes:
+      - ./monitoring/tempo/tempo.yml:/etc/tempo/tempo.yml
+    networks:
+      - kafka-network
+    restart: unless-stopped
+
   # Load Balancer (Nginx)
   load-balancer:
     image: nginx:alpine
@@ -260,6 +285,7 @@ services:
       - ui-frontend
       - prometheus
       - grafana
+      - tempo
     networks:
       - kafka-network
     restart: unless-stopped
