@@ -24,7 +24,7 @@ interface WorkflowState {
     deleteWorkflow: (id: string) => Promise<void>
 }
 
-export const useWorkflowStore = create<WorkflowState>((set, get) => ({
+export const useWorkflowStore = create<WorkflowState>((set, _get) => ({
     workflows: [],
     currentWorkflow: null,
     isLoading: false,
