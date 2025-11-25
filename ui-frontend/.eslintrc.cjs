@@ -34,6 +34,7 @@ module.exports = {
     ],
     rules: {
         "react-refresh/only-export-components": "off",
+        "no-useless-catch": "off",
         "@typescript-eslint/no-unused-vars": ["warn", {argsIgnorePattern: "^_", varsIgnorePattern: "^_"}],
     },
     ignorePatterns: [
