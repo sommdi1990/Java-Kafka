@@ -58,7 +58,8 @@ open http://localhost:3000
 - **Spring Boot Admin** for centralized monitoring
 - **CBI Service** with WSDL and external API integration
 - **Schedule Service** with Spring Batch and virtual threads
-- **Workflow Service** for process orchestration
+- **Workflow Service** for process orchestration (CRUD + execution logs + GraphQL)
+- **Workflow Designer UI** with draggable steps, live properties panel, save/update & one-click execution
 - **Gateway Service** with Spring Security authentication
 - **Kafka Manager** for cluster monitoring
 - **TypeScript UI** with drag-and-drop workflow designer
@@ -79,6 +80,7 @@ open http://localhost:3000
 | `ui-frontend/`                                                                                                       | React + TypeScript SPA (Vite) that surfaces workflow designer, dashboards, and admin tools           |
 | `monitoring/`                                                                                                        | Prometheus scrape configs plus Grafana dashboards/datasources used out of the box                    |
 | `Java-Kafka.wiki/`                                                                                                   | Source-of-truth documentation (English + Persian) synchronized with this README                      |
+| `Java-Kafka.wiki/Workflow-Designer-and-Engine.md`                                                                    | Deep dive into workflow JSON schema, UI designer, Kafka wiring, GraphQL queries                      |
 | `load-balancer/`                                                                                                     | Nginx configuration that exposes an aggregated entrypoint on port `80`                               |
 
 ## 🏗️ Architecture
@@ -103,6 +105,44 @@ open http://localhost:3000
 │   (Port: 8085)   │◄──►│   (Port: 9092)  │    │   (Port: 3306)  │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
+
+## 🔁 Workflow Orchestration Platform
+
+### Backend (workflow-service)
+
+- CRUD کامل روی `WorkflowDefinition` و نگهداری `definitionJson` نسخه‌بندی شده.
+- ذخیره هر اجرای ورک‌فلو در جدول `workflow_instances` همراه با `status`, `currentStep`, `executionTimeMs`,
+  `errorMessage`.
+- انتشار رویدادهای Kafka برای stepهای `service_call`, `graphql_call`, `schedule_task`, `data_processing`,
+  `notification`, `delay`, `external_event`.
+- APIهای REST:
+    - `GET /api/workflow/definitions` و `GET /api/workflow/definitions/{id}`
+    - `POST /api/workflow/definitions`, `PUT /api/workflow/definitions/{id}`,
+      `PATCH /api/workflow/definitions/{id}/status`
+    - `POST /api/workflow/execute/{id}` و `POST /api/workflow/execute-by-name/{name}`
+- GraphQL endpoint (`/graphql`):
+    - `workflowDefinitions(status, nameContains)`
+    - `workflowInstances(status, definitionId, from, to)`
+    - برای ساخت کوئری‌های پیشرفته در UI یا ابزارهای تحلیلی (نمونه‌ها در ویکی ذکر شده‌اند).
+
+### Frontend (Workflow Designer & List)
+
+- صفحه `WorkflowDesigner`:
+    - اضافه/حذف نودهای drag-and-drop برای همه انواع step.
+    - پنل ویژگی‌ها برای تنظیم endpoint، cron، شرط، delay و ...
+    - حالت ایجاد و ویرایش (`/workflows/designer/:id`) با امکان لود JSON → گراف.
+    - دکمه‌های Save/Update (اتصال به API جدید) و Execute (با نام ورک‌فلو).
+- صفحه `WorkflowList`:
+    - جدول ورک‌فلوها با Run، Activate/Deactivate و لینک به Designer.
+    - جدول ۱۰ اجرای اخیر + Modal جزئیات هر `WorkflowInstance`.
+    - قابلیت تازه‌سازی و مشاهده وضعیت‌های REALTIME.
+
+### Documentation
+
+- توضیحات کامل در [Workflow-Designer-and-Engine.md](Java-Kafka.wiki/Workflow-Designer-and-Engine.md) شامل:
+    - ساختار JSON، مدل‌های دیتابیس، Kafka topics
+    - نحوه‌ی کار UI و متدهای استور
+    - نمونه کوئری‌های GraphQL
 
 ## 🛠️ Technology Stack
 
