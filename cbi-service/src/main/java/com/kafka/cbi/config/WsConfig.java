@@ -11,8 +11,8 @@ public class WsConfig {
     @Bean
     public Jaxb2Marshaller jaxb2Marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        // Optionally set context path if using generated JAXB classes
-        // marshaller.setContextPath("com.kafka.cbi.ws");
+        // Set packages to scan for JAXB classes
+        marshaller.setPackagesToScan("com.kafka.cbi");
         return marshaller;
     }
 

@@ -25,11 +25,14 @@ spring:
     job:
       enabled: true
       names: dataProcessingJob
-    initialize-schema: always
+    jdbc:
+      initialize-schema: always
   
   # Quartz Configuration
   quartz:
     job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
     properties:
       org:
         quartz:
@@ -40,6 +43,8 @@ spring:
             threadCount: 10
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
+          jobStore:
+            tablePrefix: QRTZ_
   
   # Kafka Configuration
   kafka:

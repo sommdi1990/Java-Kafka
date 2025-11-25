@@ -241,6 +241,34 @@ services:
       - kafka-network
     restart: unless-stopped
 
+  # Load Balancer (Nginx)
+  load-balancer:
+    image: nginx:alpine
+    container_name: load-balancer
+    ports:
+      - "80:80"
+    volumes:
+      - ./load-balancer/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - spring-boot-admin
+      - cbi-service
+      - schedule-service
+      - workflow-service
+      - gateway-service
+      - kafka-manager
+      - kafka-ui
+      - ui-frontend
+      - prometheus
+      - grafana
+    networks:
+      - kafka-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   mysql_data:
   prometheus_data:

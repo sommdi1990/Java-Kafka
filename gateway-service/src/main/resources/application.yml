@@ -2,6 +2,8 @@
 spring:
   application:
     name: gateway-service
+  main:
+    web-application-type: reactive
   
   # Database Configuration
   datasource:
@@ -31,7 +33,9 @@ spring:
           gateway:
             client-id: gateway-client
             client-secret: gateway-secret
+            authorization-grant-type: authorization_code
             scope: read,write
+            redirect-uri: http://localhost:8084/login/oauth2/code/gateway
         provider:
           gateway:
             authorization-uri: http://localhost:8084/oauth/authorize

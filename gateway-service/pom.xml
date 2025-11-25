@@ -24,12 +24,6 @@
             <artifactId>shared-lib</artifactId>
         </dependency>
 
-        <!-- Spring Boot Web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <!-- Spring Boot Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
