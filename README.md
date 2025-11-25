@@ -133,6 +133,7 @@ open http://localhost:3000
 - [Monitoring & Observability](Java-Kafka.wiki/Monitoring.md) / [FA](Java-Kafka.wiki/FA-مانیتورینگ.md)
 - [Debugging, Logs & Troubleshooting](Java-Kafka.wiki/Debugging-Logs-and-Troubleshooting.md) / [FA](Java-Kafka.wiki/FA-دیباگ-لاگ-و-عیب‌یابی.md)
 - Changelog & Roadmap: [Changelog](Java-Kafka.wiki/Changelog.md)
+- [CI/CD Pipeline Guide](docs/CI-CD.md)
 
 > **Tip:** فایل‌های ویکی به‌صورت کامل در این ریپو نگه‌داری می‌شوند؛ پس از هر تغییر کد، برگه مربوطه را همگام کنید تا
 > مستندات و کد از هم جدا نشوند.

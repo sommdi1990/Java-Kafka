@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    name: Maven + Frontend Checks
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: "18"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui-frontend/package-lock.json
+
+      - name: Install frontend deps
+        run: npm ci
+        working-directory: ui-frontend
+
+      - name: Frontend lint & type-check
+        run: |
+          npm run lint
+          npm run type-check
+        working-directory: ui-frontend
+
+      - name: Maven verify
+        run: mvn -B -ntp clean verify
+
+      - name: Publish Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: "**/target/surefire-reports/*.xml"
+          if-no-files-found: ignore
+
+      - name: Upload frontend dist
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-frontend-dist
+          path: ui-frontend/dist
+          if-no-files-found: ignore
+
