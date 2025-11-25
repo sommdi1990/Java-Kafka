@@ -66,6 +66,20 @@ open http://localhost:3000
 - **Multi-database** MySQL setup with Flyway migrations
 - **Prometheus** for metrics collection
 - **Grafana** for monitoring dashboards
+- **Infrastructure add-ons** including Kafka UI, Prometheus/Grafana stack, and an Nginx load balancer on port `80`
+
+## 📁 Repository Structure
+
+| Path                                                                                                                 | Description                                                                                          |
+|----------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| `docker-compose.yml`                                                                                                 | One-click orchestration of databases, Kafka stack, microservices, UI, monitoring, and load balancer  |
+| `database/init/`                                                                                                     | Ordered SQL scripts that provision databases, users, and seed data for quick bootstrap               |
+| `spring-boot-admin/`, `cbi-service/`, `schedule-service/`, `workflow-service/`, `gateway-service/`, `kafka-manager/` | Individual Spring Boot services (Java 21 + GraalVM) with dedicated Dockerfiles and Flyway migrations |
+| `shared-lib/`                                                                                                        | Common DTOs, utilities, and shared security/kafka configurations consumed by all backend services    |
+| `ui-frontend/`                                                                                                       | React + TypeScript SPA (Vite) that surfaces workflow designer, dashboards, and admin tools           |
+| `monitoring/`                                                                                                        | Prometheus scrape configs plus Grafana dashboards/datasources used out of the box                    |
+| `Java-Kafka.wiki/`                                                                                                   | Source-of-truth documentation (English + Persian) synchronized with this README                      |
+| `load-balancer/`                                                                                                     | Nginx configuration that exposes an aggregated entrypoint on port `80`                               |
 
 ## 🏗️ Architecture
 
@@ -108,15 +122,26 @@ open http://localhost:3000
 
 ## 📚 Documentation
 
+- [Wiki Home & FAQ](Java-Kafka.wiki/Home.md) — بهترین نقطه شروع (FA/EN)
 - [Architecture Overview](Java-Kafka.wiki/Architecture.md)
 - [Installation Guide](Java-Kafka.wiki/Installation.md)
 - [API Documentation](Java-Kafka.wiki/API-Documentation.md)
-- [Monitoring Guide](monitoring/MONITORING.md)
+- [DB & Flyway Guide](Java-Kafka.wiki/DB-Migrations.md) / [FA](Java-Kafka.wiki/FA-راهنمای-دیتابیس-و-مایگریشن.md)
+- [Development Workflow](Java-Kafka.wiki/Development-Workflow.md) / [FA](Java-Kafka.wiki/FA-روند-توسعه.md)
+- [Security & Auth](Java-Kafka.wiki/Security-and-Auth.md) / [FA](Java-Kafka.wiki/FA-امنیت-و-احراز-هویت.md)
+- [Kafka Operations](Java-Kafka.wiki/Kafka-Operations-and-Scenarios.md) / [FA](Java-Kafka.wiki/FA-عملیات-کافکا-و-سناریوها.md)
+- [Monitoring & Observability](Java-Kafka.wiki/Monitoring.md) / [FA](Java-Kafka.wiki/FA-مانیتورینگ.md)
+- [Debugging, Logs & Troubleshooting](Java-Kafka.wiki/Debugging-Logs-and-Troubleshooting.md) / [FA](Java-Kafka.wiki/FA-دیباگ-لاگ-و-عیب‌یابی.md)
+- Changelog & Roadmap: [Changelog](Java-Kafka.wiki/Changelog.md)
+
+> **Tip:** فایل‌های ویکی به‌صورت کامل در این ریپو نگه‌داری می‌شوند؛ پس از هر تغییر کد، برگه مربوطه را همگام کنید تا
+> مستندات و کد از هم جدا نشوند.
 
 ## 🔧 Services
 
 | Service           | Port | Description                                    |
 |-------------------|------|------------------------------------------------|
+| Load Balancer     | 80   | Nginx entrypoint routing to UI/Admin/Gateway   |
 | UI Frontend       | 3000 | React TypeScript UI with workflow designer     |
 | Spring Boot Admin | 8080 | Centralized monitoring and log management      |
 | CBI Service       | 8081 | Central Business Integration with WSDL support |
