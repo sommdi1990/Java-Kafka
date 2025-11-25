@@ -1,0 +1,43 @@
+type WorkflowDefinition {
+    id: ID!
+    name: String!
+    description: String
+    version: String!
+    status: String!
+    createdBy: String
+    createdAt: String!
+    updatedAt: String
+}
+
+type WorkflowInstance {
+    id: ID!
+    workflowDefinitionId: ID!
+    instanceName: String!
+    status: String!
+    currentStep: String
+    startedBy: String
+    startedAt: String!
+    completedAt: String
+    executionTimeMs: Long
+    errorMessage: String
+}
+
+"""
+Root Query type for Workflow GraphQL API.
+Use this to build advanced filters in UI or external tools.
+"""
+type Query {
+    workflowDefinitions(
+        status: String
+        nameContains: String
+    ): [WorkflowDefinition!]!
+
+    workflowInstances(
+        status: String
+        definitionId: ID
+        from: String
+        to: String
+    ): [WorkflowInstance!]!
+}
+
+

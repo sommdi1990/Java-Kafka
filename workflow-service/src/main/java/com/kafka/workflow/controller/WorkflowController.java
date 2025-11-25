@@ -4,11 +4,17 @@ import com.kafka.shared.annotation.LogExecution;
 import com.kafka.shared.dto.ApiResponse;
 import com.kafka.shared.dto.WorkflowDefinition;
 import com.kafka.workflow.dto.WorkflowInstance;
+import com.kafka.workflow.repository.WorkflowInstanceRepository;
+import com.kafka.workflow.service.WorkflowDefinitionService;
 import com.kafka.workflow.service.WorkflowEngine;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+
+import static com.kafka.shared.dto.WorkflowDefinition.WorkflowStatus;
 
 @RestController
 @RequestMapping("/api/workflow")
@@ -16,6 +22,8 @@ import java.util.Map;
 public class WorkflowController {
 
     private final WorkflowEngine workflowEngine;
+    private final WorkflowDefinitionService workflowDefinitionService;
+    private final WorkflowInstanceRepository workflowInstanceRepository;
 
     @PostMapping("/execute/{definitionId}")
     @LogExecution
@@ -23,10 +31,9 @@ public class WorkflowController {
             @PathVariable Long definitionId,
             @RequestBody Map<String, Object> contextData) {
 
-        // In a real implementation, you would fetch the definition from database
-        WorkflowDefinition definition = createSampleDefinition(definitionId);
-
+        WorkflowDefinition definition = workflowDefinitionService.getById(definitionId);
         WorkflowInstance instance = workflowEngine.executeWorkflow(definition, contextData);
+        workflowInstanceRepository.save(instance);
         return ApiResponse.success("Workflow executed successfully", instance);
     }
 
@@ -36,74 +43,65 @@ public class WorkflowController {
             @PathVariable String workflowName,
             @RequestBody Map<String, Object> contextData) {
 
-        WorkflowDefinition definition = createSampleDefinitionByName(workflowName);
+        WorkflowDefinition definition = workflowDefinitionService.getByName(workflowName);
         WorkflowInstance instance = workflowEngine.executeWorkflow(definition, contextData);
+        workflowInstanceRepository.save(instance);
         return ApiResponse.success("Workflow executed successfully", instance);
     }
 
     @GetMapping("/definitions")
     @LogExecution
-    public ApiResponse<Object> getWorkflowDefinitions() {
-        // In a real implementation, you would fetch from database
-        return ApiResponse.success("Workflow definitions retrieved",
-                new Object() {
-                    public final String message = "Sample workflow definitions";
-                    public final int count = 3;
-                });
+    public ApiResponse<List<WorkflowDefinition>> getWorkflowDefinitions() {
+        List<WorkflowDefinition> definitions = workflowDefinitionService.getAllDefinitions();
+        return ApiResponse.success("Workflow definitions retrieved successfully", definitions);
+    }
+
+    @GetMapping("/definitions/{id}")
+    @LogExecution
+    public ApiResponse<WorkflowDefinition> getWorkflowDefinition(@PathVariable Long id) {
+        WorkflowDefinition definition = workflowDefinitionService.getById(id);
+        return ApiResponse.success("Workflow definition retrieved successfully", definition);
     }
 
     @GetMapping("/instances")
     @LogExecution
     public ApiResponse<Object> getWorkflowInstances() {
-        // In a real implementation, you would fetch from database
         return ApiResponse.success("Workflow instances retrieved",
-                new Object() {
-                    public final String message = "Sample workflow instances";
-                    public final int count = 5;
-                });
+                workflowInstanceRepository.findAll());
     }
 
-    private WorkflowDefinition createSampleDefinition(Long definitionId) {
-        String sampleWorkflow = """
-                {
-                    "name": "Sample Workflow",
-                    "version": "1.0",
-                    "steps": [
-                        {
-                            "name": "step1",
-                            "type": "service_call",
-                            "service": "cbi-service",
-                            "endpoint": "/api/cbi/rest/1"
-                        },
-                        {
-                            "name": "step2",
-                            "type": "schedule_task",
-                            "task": "data-processing",
-                            "cron": "0 0 12 * * ?"
-                        },
-                        {
-                            "name": "step3",
-                            "type": "notification",
-                            "notificationType": "email",
-                            "message": "Workflow completed successfully"
-                        }
-                    ]
-                }
-                """;
-
-        return WorkflowDefinition.builder()
-                .id(definitionId)
-                .name("Sample Workflow " + definitionId)
-                .version("1.0")
-                .definitionJson(sampleWorkflow)
-                .status(WorkflowDefinition.WorkflowStatus.ACTIVE)
-                .createdBy("system")
-                .build();
+    @GetMapping("/instances/{id}")
+    @LogExecution
+    public ApiResponse<WorkflowInstance> getWorkflowInstance(@PathVariable Long id) {
+        WorkflowInstance instance = workflowInstanceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Workflow instance not found: " + id));
+        return ApiResponse.success("Workflow instance retrieved successfully", instance);
     }
 
-    private WorkflowDefinition createSampleDefinitionByName(String workflowName) {
-        return createSampleDefinition(1L).toBuilder()
-                .name(workflowName)
-                .build();
+    @PostMapping("/definitions")
+    @LogExecution
+    public ApiResponse<WorkflowDefinition> createWorkflowDefinition(@Valid @RequestBody WorkflowDefinition definition) {
+        WorkflowDefinition created = workflowDefinitionService.create(definition);
+        return ApiResponse.success("Workflow definition created successfully", created);
+    }
+
+    @PutMapping("/definitions/{id}")
+    @LogExecution
+    public ApiResponse<WorkflowDefinition> updateWorkflowDefinition(
+            @PathVariable Long id,
+            @Valid @RequestBody WorkflowDefinition definition) {
+
+        WorkflowDefinition updated = workflowDefinitionService.update(id, definition);
+        return ApiResponse.success("Workflow definition updated successfully", updated);
+    }
+
+    @PatchMapping("/definitions/{id}/status")
+    @LogExecution
+    public ApiResponse<WorkflowDefinition> updateWorkflowStatus(
+            @PathVariable Long id,
+            @RequestParam WorkflowStatus status) {
+
+        WorkflowDefinition updated = workflowDefinitionService.updateStatus(id, status);
+        return ApiResponse.success("Workflow status updated successfully", updated);
     }
 }

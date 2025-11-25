@@ -1,13 +1,15 @@
 import {create} from 'zustand'
 
-interface Workflow {
-    id: string
+export interface Workflow {
+    id: number
     name: string
+    description?: string
     version: string
-    definition: any
-    status: string
+    definitionJson?: string
+    status: 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'ARCHIVED'
+    createdBy?: string
     createdAt: string
-    updatedAt: string
+    updatedAt?: string
 }
 
 interface WorkflowState {
@@ -19,12 +21,25 @@ interface WorkflowState {
     setCurrentWorkflow: (workflow: Workflow | null) => void
     setLoading: (loading: boolean) => void
 
-    saveWorkflow: (workflowData: any) => Promise<void>
-    executeWorkflow: (workflowData: any) => Promise<void>
-    deleteWorkflow: (id: string) => Promise<void>
+    loadWorkflows: () => Promise<void>
+    loadWorkflowById: (id: number) => Promise<Workflow>
+    saveWorkflow: (payload: {
+        name: string;
+        version: string;
+        definitionJson: string;
+        description?: string
+    }) => Promise<Workflow>
+    updateWorkflow: (id: number, payload: {
+        name: string;
+        version: string;
+        definitionJson: string;
+        description?: string
+    }) => Promise<Workflow>
+    executeWorkflowByName: (workflowName: string, context?: any) => Promise<void>
+    updateWorkflowStatus: (id: number, status: Workflow['status']) => Promise<void>
 }
 
-export const useWorkflowStore = create<WorkflowState>((set, _get) => ({
+export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     workflows: [],
     currentWorkflow: null,
     isLoading: false,
@@ -41,69 +56,134 @@ export const useWorkflowStore = create<WorkflowState>((set, _get) => ({
         set({isLoading: loading})
     },
 
-    saveWorkflow: async (workflowData: any) => {
+    loadWorkflows: async () => {
         set({isLoading: true})
         try {
-            const response = await fetch('/api/workflow/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(workflowData),
-            })
-
-            if (response.ok) {
-                const data = await response.json()
-                set((state) => ({
-                    workflows: [...state.workflows, data.data],
-                }))
-            } else {
-                throw new Error('Failed to save workflow')
+            const response = await fetch('/api/workflow/definitions')
+            if (!response.ok) {
+                throw new Error('Failed to load workflows')
             }
-        } catch (error) {
-            throw error
+            const body = await response.json()
+            set({workflows: body.data as Workflow[]})
         } finally {
             set({isLoading: false})
         }
     },
 
-    executeWorkflow: async (workflowData: any) => {
+    loadWorkflowById: async (id: number) => {
         set({isLoading: true})
         try {
-            const response = await fetch('/api/workflow/execute', {
+            const response = await fetch(`/api/workflow/definitions/${id}`)
+            if (!response.ok) {
+                throw new Error('Failed to load workflow')
+            }
+            const body = await response.json()
+            const wf = body.data as Workflow
+            set({currentWorkflow: wf})
+            return wf
+        } finally {
+            set({isLoading: false})
+        }
+    },
+
+    saveWorkflow: async (payload) => {
+        set({isLoading: true})
+        try {
+            const response = await fetch('/api/workflow/definitions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(workflowData),
+                body: JSON.stringify({
+                    ...payload,
+                    status: 'ACTIVE',
+                }),
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to save workflow')
+            }
+
+            const body = await response.json()
+            const created = body.data as Workflow
+
+            set({
+                workflows: [...get().workflows, created],
+                currentWorkflow: created,
+            })
+
+            return created
+        } finally {
+            set({isLoading: false})
+        }
+    },
+
+    updateWorkflow: async (id, payload) => {
+        set({isLoading: true})
+        try {
+            const response = await fetch(`/api/workflow/definitions/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to update workflow')
+            }
+
+            const body = await response.json()
+            const updated = body.data as Workflow
+
+            set((state) => ({
+                workflows: state.workflows.map((w) => (w.id === id ? updated : w)),
+                currentWorkflow: updated,
+            }))
+
+            return updated
+        } finally {
+            set({isLoading: false})
+        }
+    },
+
+    executeWorkflowByName: async (workflowName: string, context: any = {}) => {
+        set({isLoading: true})
+        try {
+            const response = await fetch(`/api/workflow/execute-by-name/${encodeURIComponent(workflowName)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(context),
             })
 
             if (!response.ok) {
                 throw new Error('Failed to execute workflow')
             }
-        } catch (error) {
-            throw error
         } finally {
             set({isLoading: false})
         }
     },
 
-    deleteWorkflow: async (id: string) => {
+    updateWorkflowStatus: async (id: number, status: Workflow['status']) => {
         set({isLoading: true})
         try {
-            const response = await fetch(`/api/workflow/${id}`, {
-                method: 'DELETE',
+            const response = await fetch(`/api/workflow/definitions/${id}/status?status=${status}`, {
+                method: 'PATCH',
             })
 
-            if (response.ok) {
-                set((state) => ({
-                    workflows: state.workflows.filter((w) => w.id !== id),
-                }))
-            } else {
-                throw new Error('Failed to delete workflow')
+            if (!response.ok) {
+                throw new Error('Failed to update workflow status')
             }
-        } catch (error) {
-            throw error
+
+            const body = await response.json()
+            const updated = body.data as Workflow
+
+            set((state) => ({
+                workflows: state.workflows.map((w) => (w.id === id ? updated : w)),
+                currentWorkflow: state.currentWorkflow?.id === id ? updated : state.currentWorkflow,
+            }))
         } finally {
             set({isLoading: false})
         }
