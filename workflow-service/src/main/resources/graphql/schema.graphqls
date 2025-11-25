@@ -18,7 +18,7 @@ type WorkflowInstance {
     startedBy: String
     startedAt: String!
     completedAt: String
-    executionTimeMs: Long
+    executionTimeMs: Int
     errorMessage: String
 }
 

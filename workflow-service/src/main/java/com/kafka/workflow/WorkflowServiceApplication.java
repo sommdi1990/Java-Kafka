@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.kafka.workflow", "com.kafka.shared"})
-@EnableJpaRepositories(basePackages = {"com.kafka.shared"})
-@EntityScan(basePackages = {"com.kafka.shared"})
+@EnableJpaRepositories(basePackages = {"com.kafka.workflow", "com.kafka.shared"})
+@EntityScan(basePackages = {"com.kafka.workflow", "com.kafka.shared"})
 public class WorkflowServiceApplication {
 
     public static void main(String[] args) {
